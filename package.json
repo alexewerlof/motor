@@ -1,0 +1,16 @@
+{
+  "name": "motor",
+  "version": "0.0.1",
+  "description": "The motor that is used for various userpixel timer applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:userpixel/motor.git"
+  },
+  "author": "userpixel",
+  "license": "MIT",
+  "homepage": "https://www.userpixel.com"
+}
