@@ -32,4 +32,12 @@ describe('motor', function() {
       expect(m._timerHandle).to.be.null;
     });
   });
+
+  it('immediately emits a tick upon start', function (done) {
+    m.addListener('tick', function () {
+      done();
+    });
+    m.start();
+    m.stop();
+  });
 });

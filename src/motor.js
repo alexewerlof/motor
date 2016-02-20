@@ -107,6 +107,7 @@ var Motor = function (_EventEmitter) {
       this.stop();
       this._startTime = now();
       this._nextTick = this._startTime + 1;
+      this.emit('tick', 0);
       this._timerHandle = setTimeout(this._tick, MOTOR_INTERVAL);
     }
 
