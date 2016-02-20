@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -30,6 +34,14 @@ var EventEmitter = require('events');
 var MOTOR_INTERVAL = 200;
 
 /**
+ * Gives the number of seconds (not milliseconds) since epoch
+ * @return {Number} a number with fractional part
+ */
+function now() {
+  return new Date().getTime() / 1000;
+}
+
+/**
  * You should listen to the 'tick' event.
  * Listenning to the 'error' event is recommended too.
  */
@@ -44,14 +56,12 @@ var Motor = function (_EventEmitter) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Motor).call(this));
 
-    _this.startTime = 0;
+    _this._startTime = 0;
     /** the epoch (in seconds) that the callback is expected to be called next time */
-    _this.nextTime = 0;
-    /** the callback function that is passed to the start() function */
-    _this.callback = 0;
+    _this._nextTime = 0;
     /** the handler to the setTimeout() call */
-    _this.timerHandle = null;
-    _this.boundTick = _this.tick.bind(_this);
+    _this._timerHandle = null;
+    _this._boundTick = _this._tick.bind(_this);
     return _this;
   }
 
@@ -67,32 +77,21 @@ var Motor = function (_EventEmitter) {
   _createClass(Motor, [{
     key: '_tick',
     value: function _tick() {
-      var t = this._now();
+      var t = now();
 
-      if (this.nextTime <= t) {
+      if (this._nextTime <= t) {
         //compute number of seconds from when the motor started
-        var passedSec = Math.floor(t - this.startTime);
+        var passedSec = Math.floor(t - this._startTime);
         //compute when will be the next call
-        this.nextTime = this.startTime + this.passedSec + 1;
+        this._nextTime = this._startTime + this._passedSec + 1;
         this.emit('tick', passedSec);
       }
 
       // Only schedule another callback if the current callback is not cleared.
       // The callback may stop the timer. In that case we shouldn't schedule a new timeout event.
-      if (this.timerHandle) {
-        this.timerHandle = setTimeout(this.boundTick, MOTOR_INTERVAL);
+      if (this._timerHandle) {
+        this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
       }
-    }
-
-    /**
-     * Gives the number of seconds (not milliseconds) since epoch
-     * @return {Number} a number with fractional part
-     */
-
-  }, {
-    key: '_now',
-    value: function _now() {
-      return new Date().getTime() / 1000;
     }
 
     /** starts the motor
@@ -106,10 +105,20 @@ var Motor = function (_EventEmitter) {
     key: 'start',
     value: function start() {
       //first make sure that the engine is stopped
-      stop();
-      this.startTime = this._now();
-      this.nextTime = this.startTime + 1;
-      timerHandle = setTimeout(this.boundTick, MOTOR_INTERVAL);
+      this.stop();
+      this._startTime = now();
+      this._nextTime = this._startTime + 1;
+      this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
+    }
+
+    /**
+     * @return {boolean} returns true if the timer has a timeout already scheduled
+     */
+
+  }, {
+    key: 'isRunning',
+    value: function isRunning() {
+      return !!this._timerHandle;
     }
 
     /** stops the motor so the callback function will not be called anymore */
@@ -117,12 +126,14 @@ var Motor = function (_EventEmitter) {
   }, {
     key: 'stop',
     value: function stop() {
-      if (this.timerHandle) {
-        clearTimeout(this.timerHandle);
-        this.timerHandle = null;
+      if (this.isRunning()) {
+        clearTimeout(this._timerHandle);
+        this._timerHandle = null;
       }
     }
   }]);
 
   return Motor;
 }(EventEmitter);
+
+exports.default = Motor;

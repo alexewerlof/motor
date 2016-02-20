@@ -2,12 +2,12 @@
   "name": "motor",
   "version": "0.0.1",
   "description": "The motor that is used for various userpixel timer applications",
-  "main": "src/index.js",
+  "main": "src/motor.js",
   "scripts": {
     "build": "babel src -x .es6 -d src",
     "pretest": "npm run build && babel test -x .es6 -d test",
     "test": "mocha",
-    "prepublish": "npm run build"
+    "prepublish": "npm test"
   },
   "repository": {
     "type": "git",

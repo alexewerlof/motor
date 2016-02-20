@@ -20,22 +20,29 @@ const EventEmitter = require('events');
 const MOTOR_INTERVAL = 200;
 
 /**
+ * Gives the number of seconds (not milliseconds) since epoch
+ * @return {Number} a number with fractional part
+ */
+function now() {
+  return new Date().getTime() / 1000;
+}
+
+
+/**
  * You should listen to the 'tick' event.
  * Listenning to the 'error' event is recommended too.
  */
-class Motor extends EventEmitter {
+export default class Motor extends EventEmitter {
 
   constructor() {
       super();
       /** the epoch (in seconds) since the timer got started */
-      this.startTime = 0;
+      this._startTime = 0;
       /** the epoch (in seconds) that the callback is expected to be called next time */
-      this.nextTime = 0;
-      /** the callback function that is passed to the start() function */
-      this.callback = 0;
+      this._nextTime = 0;
       /** the handler to the setTimeout() call */
-      this.timerHandle = null;
-      this.boundTick = this.tick.bind(this);
+      this._timerHandle = null;
+      this._boundTick = this._tick.bind(this);
     }
 
     /**
@@ -46,29 +53,21 @@ class Motor extends EventEmitter {
      * callback function takes too long.
      */
   _tick() {
-    var t = this._now();
+    var t = now();
 
-    if (this.nextTime <= t) {
+    if (this._nextTime <= t) {
       //compute number of seconds from when the motor started
-      let passedSec = Math.floor(t - this.startTime);
+      let passedSec = Math.floor(t - this._startTime);
       //compute when will be the next call
-      this.nextTime = this.startTime + this.passedSec + 1;
+      this._nextTime = this._startTime + this._passedSec + 1;
       this.emit('tick', passedSec);
     }
 
     // Only schedule another callback if the current callback is not cleared.
     // The callback may stop the timer. In that case we shouldn't schedule a new timeout event.
-    if (this.timerHandle) {
-      this.timerHandle = setTimeout(this.boundTick, MOTOR_INTERVAL);
+    if (this._timerHandle) {
+      this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
     }
-  }
-
-  /**
-   * Gives the number of seconds (not milliseconds) since epoch
-   * @return {Number} a number with fractional part
-   */
-  _now() {
-    return new Date().getTime() / 1000;
   }
 
   /** starts the motor
@@ -79,17 +78,24 @@ class Motor extends EventEmitter {
    */
   start() {
     //first make sure that the engine is stopped
-    stop();
-    this.startTime = this._now();
-    this.nextTime = this.startTime + 1;
-    timerHandle = setTimeout(this.boundTick, MOTOR_INTERVAL);
+    this.stop();
+    this._startTime = now();
+    this._nextTime = this._startTime + 1;
+    this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
+  }
+
+  /**
+   * @return {boolean} returns true if the timer has a timeout already scheduled
+   */
+  isRunning() {
+    return !!this._timerHandle;
   }
 
   /** stops the motor so the callback function will not be called anymore */
   stop() {
-    if (this.timerHandle) {
-      clearTimeout(this.timerHandle);
-      this.timerHandle = null;
+    if (this.isRunning()) {
+      clearTimeout(this._timerHandle);
+      this._timerHandle = null;
     }
   }
 }
