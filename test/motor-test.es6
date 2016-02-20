@@ -1,5 +1,6 @@
-const Motor = require('../src/motor.js').default;
-const expect = require('chai').expect;
+import Motor from '../src/motor.js';
+import chai from 'chai'
+const expect = chai.expect;
 
 describe('motor', function () {
   var m;
