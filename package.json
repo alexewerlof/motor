@@ -2,9 +2,12 @@
   "name": "motor",
   "version": "0.0.1",
   "description": "The motor that is used for various userpixel timer applications",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "babel src -x .es6 -d src",
+    "pretest": "npm run build && babel test -x .es6 -d test",
+    "test": "mocha",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -15,6 +18,8 @@
   "homepage": "https://www.userpixel.com",
   "devDependencies": {
     "babel-cli": "^6.5.1",
-    "babel-preset-es2015": "^6.5.0"
+    "babel-preset-es2015": "^6.5.0",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
   }
 }

@@ -54,6 +54,7 @@ var Motor = function (_EventEmitter) {
     _this.boundTick = _this.tick.bind(_this);
     return _this;
   }
+
   /**
    * The interval function that will be called every second while the timer is running
    * It is not guaranteed that this function will be called every single second.
