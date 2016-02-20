@@ -44,7 +44,7 @@ describe('motor', function () {
   });
 
   describe('start()', function () {
-    it('immediately emits a tick upon start', function (done) {
+    it('immediately emits a tick', function (done) {
       m.addListener('tick', function (passedSec, passedSecFloor) {
         expect(passedSec).to.be.zero;
         expect(passedSecFloor).to.be.zero;
@@ -59,9 +59,9 @@ describe('motor', function () {
       m.start();
       m.addListener('tick', function (passedSec, passedSecFloor) {
         var tickTimeStamp = Date.now();
-        expect(tickTimeStamp).to.be.closeTo(startTimeStamp + 1000, 200);
+        expect(tickTimeStamp).to.be.closeTo(startTimeStamp + 1000, 100);
         expect(passedSec).to.be.above(1);
-        expect(passedSec).to.be.closeTo(1, 0.2);
+        expect(passedSec).to.be.closeTo(1, 0.1);
         expect(passedSecFloor).to.be.equal(1);
         done();
       });

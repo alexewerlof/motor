@@ -49,9 +49,9 @@ describe('motor', function() {
       m.start();
       m.addListener('tick', function (passedSec, passedSecFloor) {
         var tickTimeStamp = Date.now();
-        expect(tickTimeStamp).to.be.closeTo(startTimeStamp + 1000, 200);
+        expect(tickTimeStamp).to.be.closeTo(startTimeStamp + 1000, 100);
         expect(passedSec).to.be.above(1);
-        expect(passedSec).to.be.closeTo(1, 0.2);
+        expect(passedSec).to.be.closeTo(1, 0.1);
         expect(passedSecFloor).to.be.equal(1);
         done();
       });
