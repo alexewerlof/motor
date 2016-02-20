@@ -71,7 +71,7 @@ describe('motor', function () {
       });
     });
 
-    it('Ticks happen every second', function (done) {
+    it('generates ticks with acceptable errors every second', function (done) {
       var Iterations = 10;
       var i = 0;
       // Set a deadline for how long it can take before Mocha's done() callback is called
