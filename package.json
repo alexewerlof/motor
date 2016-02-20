@@ -6,13 +6,13 @@
   "scripts": {
     "build": "babel src -x .es6 -d src",
     "pretest": "npm run build && babel test -x .es6 -d test",
-    "test": "mocha",
-    "prepublish": "npm test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:userpixel/motor.git"
   },
+  "private": true,
   "author": "userpixel",
   "license": "MIT",
   "homepage": "https://www.userpixel.com",
