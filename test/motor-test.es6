@@ -1,6 +1,7 @@
 import Motor from '../src/motor.js';
 import chai from 'chai'
 const expect = chai.expect;
+const assert = chai.assert;
 
 describe('motor', function() {
   var m;
@@ -14,9 +15,11 @@ describe('motor', function() {
   });
 
   it('its public interface is in place', function() {
-    expect(m.start).to.be.a('function');
-    expect(m.stop).to.be.a('function');
-    expect(m.isRunning).to.be.a('function');
+    assert.isFunction(m.start, 'start()');
+    assert.isFunction(m.stop, 'stop()');
+    assert.isFunction(m.isRunning, 'isRunning()');
+    assert.isFunction(m.addListener, 'addListener()');
+    assert.isFunction(m.removeListener, 'removeListener()');
   });
 
   describe('isRunning()', function() {

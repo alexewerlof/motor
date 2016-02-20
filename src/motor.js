@@ -6,30 +6,34 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _events = require('events');
+
+var _events2 = _interopRequireDefault(_events);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This is the motoric part of the timer.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * It encapsulates all the routines that control starting, pausing, restarting and stopping the timer with
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * highest possible precision.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * It is built to last and tolerate things like browser crash, restart, shutdown or even daylight saving time shifts.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * It is atomic, modular and well tested.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This is a state of the art code that is the heart of the product.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Logic:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * There is a _tick() function that will be called as quickly as possible (not quicker than MOTOR_INTERVAL).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * This function checks if at least one second has been passed since start() was called or the callback was called last time.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * If this is the case the callback will be called passing the number of seconds since start() was called.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Essentially this motor eliminates two problems:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 1. If the browser doesn't call setTimeout() as quick as we expect, the timer will not be delayed for it
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 2. If the computer for any reason gets too busy executing the callback function, another call will not initiate
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *    until the previous execution of callback is finished.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
-/**
- * This is the motoric part of the timer.
- * It encapsulates all the routines that control starting, pausing, restarting and stopping the timer with
- * highest possible precision.
- * It is built to last and tolerate things like browser crash, restart, shutdown or even daylight saving time shifts.
- * It is atomic, modular and well tested.
- * This is a state of the art code that is the heart of the product.
- *
- * Logic:
- * There is a _tick() function that will be called as quickly as possible (not quicker than MOTOR_INTERVAL).
- * This function checks if at least one second has been passed since start() was called or the callback was called last time.
- * If this is the case the callback will be called passing the number of seconds since start() was called.
- * Essentially this motor eliminates two problems:
- * 1. If the browser doesn't call setTimeout() as quick as we expect, the timer will not be delayed for it
- * 2. If the computer for any reason gets too busy executing the callback function, another call will not initiate
- *    until the previous execution of callback is finished.
- */
-var EventEmitter = require('events');
 
 var MOTOR_INTERVAL = 200;
 
@@ -68,7 +72,7 @@ var Motor = function (_EventEmitter) {
      * For example if the browser doesn't run the setTimeout() as quick as we expect or if running the
      * callback function takes too long.
      */
-    _this._boundTick = function () {
+    _this._tick = function () {
       var t = now();
 
       if (_this._nextTick <= t) {
@@ -82,7 +86,7 @@ var Motor = function (_EventEmitter) {
       // Only schedule another callback if the current callback is not cleared.
       // The callback may stop the timer. In that case we shouldn't schedule a new timeout event.
       if (_this._timerHandle) {
-        _this._timerHandle = setTimeout(_this._boundTick, MOTOR_INTERVAL);
+        _this._timerHandle = setTimeout(_this._tick, MOTOR_INTERVAL);
       }
     };
     return _this;
@@ -103,7 +107,7 @@ var Motor = function (_EventEmitter) {
       this.stop();
       this._startTime = now();
       this._nextTick = this._startTime + 1;
-      this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
+      this._timerHandle = setTimeout(this._tick, MOTOR_INTERVAL);
     }
 
     /**
@@ -129,6 +133,6 @@ var Motor = function (_EventEmitter) {
   }]);
 
   return Motor;
-}(EventEmitter);
+}(_events2.default);
 
 exports.default = Motor;

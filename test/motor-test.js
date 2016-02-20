@@ -11,6 +11,7 @@ var _chai2 = _interopRequireDefault(_chai);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var expect = _chai2.default.expect;
+var assert = _chai2.default.assert;
 
 describe('motor', function () {
   var m;
@@ -24,11 +25,11 @@ describe('motor', function () {
   });
 
   it('its public interface is in place', function () {
-    expect(m.start).to.be.a('function');
-    expect(m.stop).to.be.a('function');
-    expect(m.isRunning).to.be.a('function');
-    expect(m.on).to.be.a('function');
-    expect(m.off).to.be.a('function');
+    assert.isFunction(m.start, 'start()');
+    assert.isFunction(m.stop, 'stop()');
+    assert.isFunction(m.isRunning, 'isRunning()');
+    assert.isFunction(m.addListener, 'addListener()');
+    assert.isFunction(m.removeListener, 'removeListener()');
   });
 
   describe('isRunning()', function () {
