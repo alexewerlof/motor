@@ -15,7 +15,7 @@
  * 2. If the computer for any reason gets too busy executing the callback function, another call will not initiate
  *    until the previous execution of callback is finished.
  */
-const EventEmitter = require('events');
+import EventEmitter from 'events';
 
 const MOTOR_INTERVAL = 200;
 
@@ -26,7 +26,6 @@ const MOTOR_INTERVAL = 200;
 function now() {
   return new Date().getTime() / 1000;
 }
-
 
 /**
  * You should listen to the 'tick' event.
@@ -49,7 +48,7 @@ export default class Motor extends EventEmitter {
      * For example if the browser doesn't run the setTimeout() as quick as we expect or if running the
      * callback function takes too long.
      */
-    this._boundTick = () => {
+    this._tick = () => {
       var t = now();
 
       if (this._nextTick <= t) {
@@ -63,7 +62,7 @@ export default class Motor extends EventEmitter {
       // Only schedule another callback if the current callback is not cleared.
       // The callback may stop the timer. In that case we shouldn't schedule a new timeout event.
       if (this._timerHandle) {
-        this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
+        this._timerHandle = setTimeout(this._tick, MOTOR_INTERVAL);
       }
     }
   }
@@ -79,7 +78,7 @@ export default class Motor extends EventEmitter {
     this.stop();
     this._startTime = now();
     this._nextTick = this._startTime + 1;
-    this._timerHandle = setTimeout(this._boundTick, MOTOR_INTERVAL);
+    this._timerHandle = setTimeout(this._tick, MOTOR_INTERVAL);
   }
 
   /**
