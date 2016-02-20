@@ -23,8 +23,8 @@ const MOTOR_INTERVAL = 200;
  * Gives the number of seconds (not milliseconds) since epoch
  * @return {Number} a number with fractional part
  */
-function now() {
-  return new Date().getTime() / 1000;
+function timeStampSec() {
+  return Date.now() / 1000;
 }
 
 /**
@@ -49,15 +49,15 @@ export default class Motor extends EventEmitter {
      * callback function takes too long.
      */
     this._tick = () => {
-      var t = now();
+      var tickTimeStamp = timeStampSec();
 
-      if (this._nextTick <= t) {
+      if (this._nextTick <= tickTimeStamp) {
         //compute number of seconds from when the motor started
-        let passedMs = Math.floor(t - this._startTime);
-        let passedSec = Math.floor(passedMs);
+        let passedSec = tickTimeStamp - this._startTime;
+        let passedSecFloor = Math.floor(passedSec);
         //compute when will be the next call
-        this._nextTick = this._startTime + passedSec + 1;
-        this.emit('tick', passedMs, passedSec);
+        this._nextTick = this._startTime + passedSecFloor + 1;
+        this.emit('tick', passedSec, passedSecFloor);
       }
 
       // Only schedule another callback if the current callback is not cleared.
@@ -77,7 +77,7 @@ export default class Motor extends EventEmitter {
   start() {
     //first make sure that the engine is stopped
     this.stop();
-    this._startTime = now();
+    this._startTime = timeStampSec();
     this._nextTick = this._startTime + 1;
     this.emit('tick', 0);
     this._timerHandle = setTimeout(this._tick, MOTOR_INTERVAL);

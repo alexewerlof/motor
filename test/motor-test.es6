@@ -33,13 +33,28 @@ describe('motor', function() {
     });
   });
 
-  it('immediately emits a tick upon start', function (done) {
-    m.addListener('tick', function (passedMs, passedSec) {
-      expect(passedMs).to.be.zero;
-      expect(passedSec).to.be.zero;
-      done();
+  describe('start()', function() {
+    it('immediately emits a tick upon start', function(done) {
+      m.addListener('tick', function(passedSec, passedSecFloor) {
+        expect(passedSec).to.be.zero;
+        expect(passedSecFloor).to.be.zero;
+        done();
+      });
+      m.start();
+      m.stop();
     });
-    m.start();
-    m.stop();
+
+    it('emits a tick roughly one second after', function(done) {
+      var startTimeStamp = Date.now();
+      m.start();
+      m.addListener('tick', function (passedSec, passedSecFloor) {
+        var tickTimeStamp = Date.now();
+        expect(tickTimeStamp).to.be.closeTo(startTimeStamp + 1000, 200);
+        expect(passedSec).to.be.above(1);
+        expect(passedSec).to.be.closeTo(1, 0.2);
+        expect(passedSecFloor).to.be.equal(1);
+        done();
+      });
+    });
   });
 });
