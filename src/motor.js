@@ -77,10 +77,11 @@ var Motor = function (_EventEmitter) {
 
       if (_this._nextTick <= t) {
         //compute number of seconds from when the motor started
-        var passedSec = Math.floor(t - _this._startTime);
+        var passedMs = Math.floor(t - _this._startTime);
+        var passedSec = Math.floor(passedMs);
         //compute when will be the next call
-        _this._nextTick = _this._startTime + _this._passedSec + 1;
-        _this.emit('tick', passedSec);
+        _this._nextTick = _this._startTime + passedSec + 1;
+        _this.emit('tick', passedMs, passedSec);
       }
 
       // Only schedule another callback if the current callback is not cleared.

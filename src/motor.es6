@@ -53,10 +53,11 @@ export default class Motor extends EventEmitter {
 
       if (this._nextTick <= t) {
         //compute number of seconds from when the motor started
-        let passedSec = Math.floor(t - this._startTime);
+        let passedMs = Math.floor(t - this._startTime);
+        let passedSec = Math.floor(passedMs);
         //compute when will be the next call
-        this._nextTick = this._startTime + this._passedSec + 1;
-        this.emit('tick', passedSec);
+        this._nextTick = this._startTime + passedSec + 1;
+        this.emit('tick', passedMs, passedSec);
       }
 
       // Only schedule another callback if the current callback is not cleared.

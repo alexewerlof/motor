@@ -34,7 +34,9 @@ describe('motor', function() {
   });
 
   it('immediately emits a tick upon start', function (done) {
-    m.addListener('tick', function () {
+    m.addListener('tick', function (passedMs, passedSec) {
+      expect(passedMs).to.be.zero;
+      expect(passedSec).to.be.zero;
       done();
     });
     m.start();
